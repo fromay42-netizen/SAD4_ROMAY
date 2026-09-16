@@ -1,0 +1,8 @@
+# Environment / editor files
+node_modules/
+.DS_Store
+*.log
+
+# Note: js/config.js holds the Supabase URL + anon (public) key.
+# The anon key is designed to be exposed to browsers, but if you keep
+# service-role keys anywhere keep them out of the repository.
