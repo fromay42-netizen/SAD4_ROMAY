@@ -149,10 +149,10 @@
         `<button class="btn" onclick="App.go('approvals')">Review approvals</button>`,
         greeting +
           statCards([
-            ["Pending approval", pending.length, "badge-pending"],
-            ["Awaiting scheduling", toSchedule.length, "badge-approved"],
-            ["Active reservations", (res || []).filter((r) => ["scheduled", "in_use"].includes(r.status)).length, "badge-inuse"],
-            ["Open service requests", open.length, "badge-maintenance"]
+            ["Pending approval", pending.length, "badge-pending", "alert", "c-warn"],
+            ["Awaiting scheduling", toSchedule.length, "badge-approved", "clock", "c-ok"],
+            ["Active reservations", (res || []).filter((r) => ["scheduled", "in_use"].includes(r.status)).length, "badge-inuse", "trend", "c-info"],
+            ["Open service requests", open.length, "badge-maintenance", "wrench", "c-danger"]
           ]) +
           `<div class="grid-2">
             <div class="card">
@@ -185,10 +185,10 @@
         `<button class="btn" onclick="App.go('services')">New service request</button>`,
         greeting +
           statCards([
-            ["Scheduled today", todaySched.length, "badge-scheduled"],
-            ["Facilities in use", inUse.length, "badge-inuse"],
-            ["Open service requests", open.length, "badge-maintenance"],
-            ["Active facilities", (fac || []).filter((f) => f.status === "active").length, "badge-active"]
+            ["Scheduled today", todaySched.length, "badge-scheduled", "clock", "c-primary"],
+            ["Facilities in use", inUse.length, "badge-inuse", "trend", "c-info"],
+            ["Open service requests", open.length, "badge-maintenance", "wrench", "c-warn"],
+            ["Active facilities", (fac || []).filter((f) => f.status === "active").length, "badge-active", "building", "c-ok"]
           ]) +
           `<div class="card">
             <h3>Reservations to attend today</h3>
@@ -209,10 +209,10 @@
       `<button class="btn btn-primary" onclick="App.go('facilities')">Book a facility</button>`,
       greeting +
         statCards([
-          ["My reservations", mine.length, "badge-active"],
-          ["Pending approval", pending.length, "badge-pending"],
-          ["Upcoming (approved/scheduled)", upcoming.length, "badge-approved"],
-          ["Completed", mine.filter((r) => r.status === "completed").length, "badge-completed"]
+          ["My reservations", mine.length, "badge-active", "calendar", "c-primary"],
+          ["Pending approval", pending.length, "badge-pending", "alert", "c-warn"],
+          ["Upcoming (approved/scheduled)", upcoming.length, "badge-approved", "trend", "c-ok"],
+          ["Completed", mine.filter((r) => r.status === "completed").length, "badge-completed", "check", "c-info"]
         ]) +
         `<div class="card">
           <h3>My recent reservations</h3>
@@ -223,7 +223,10 @@
 
   function statCards(items) {
     return `<div class="stat-grid">${items
-      .map(([k, v, cls]) => `<div class="card stat-card"><div class="stat-value ${cls}">${v}</div><div class="stat-label">${k}</div></div>`)
+      .map(([k, v, cls, icon, acc]) => `<div class="card stat-card">
+        <div class="stat-ico ${acc || "c-primary"}">${(window.APP_ICONS && window.APP_ICONS[icon]) || ""}</div>
+        <div><div class="stat-value ${cls}">${v}</div><div class="stat-label">${k}</div></div>
+      </div>`)
       .join("")}</div>`;
   }
 
@@ -243,9 +246,12 @@
           <h3>${UI.esc(f.name)}</h3>
           ${UI.badge(f.status)}
         </div>
-        <p class="muted small"><b>Location:</b> ${UI.esc(f.location)} · <b>Capacity:</b> ${f.capacity}</p>
-        <p>${UI.esc(f.description)}</p>
-        ${f.condition_note ? `<p class="muted small"><b>Condition:</b> ${UI.esc(f.condition_note)}</p>` : ""}
+        <div class="meta-row">
+          <span class="chip">${window.APP_ICONS.pin} ${UI.esc(f.location)}</span>
+          <span class="chip">${window.APP_ICONS.users} ${f.capacity}</span>
+          ${f.condition_note ? `<span class="chip chip-warn">${window.APP_ICONS.alert} ${UI.esc(f.condition_note)}</span>` : ""}
+        </div>
+        <p class="fac-desc">${UI.esc(f.description)}</p>
         <div class="facility-actions">
           ${f.status === "active" ? `<button class="btn btn-sm btn-primary" onclick="App.bookingModal('${f.id}','${UI.esc(f.name)}')">Reserve</button>` : `<button class="btn btn-sm" disabled title="BR-B4-08">Not reservable</button>`}
           ${staff || admin ? `<button class="btn btn-sm" onclick="App.conditionModal('${f.id}','${UI.esc(f.name)}','${UI.esc(f.condition_note)}')">Update condition</button>` : ""}
@@ -406,10 +412,10 @@
       "Reservation activity and facility utilisation.",
       "",
       statCards([
-        ["Total reservations", rows.length, "badge-active"],
-        ["Approval rate", rows.length ? `${Math.round(((statusCounts.approved || 0) + (statusCounts.scheduled || 0) + (statusCounts.in_use || 0) + (statusCounts.completed || 0)) / rows.length * 100)}%` : "—", "badge-approved"],
-        ["Cancelled", statusCounts.cancelled || 0, "badge-cancelled"],
-        ["Open service concerns", svcOpen, "badge-maintenance"]
+        ["Total reservations", rows.length, "badge-active", "calendar", "c-primary"],
+        ["Approval rate", rows.length ? `${Math.round(((statusCounts.approved || 0) + (statusCounts.scheduled || 0) + (statusCounts.in_use || 0) + (statusCounts.completed || 0)) / rows.length * 100)}%` : "—", "badge-approved", "check", "c-ok"],
+        ["Cancelled", statusCounts.cancelled || 0, "badge-cancelled", "alert", "c-danger"],
+        ["Open service concerns", svcOpen, "badge-maintenance", "wrench", "c-warn"]
       ]) +
       `<div class="grid-2">
         <div class="card"><h3>Reservations by status</h3>

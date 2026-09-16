@@ -13,6 +13,31 @@
   const PROTECTED = ["dashboard", "facilities", "reservations", "approvals", "services", "audit", "reports", "users"];
   const ROLE_ONLY = { approvals: "administrator", audit: "administrator", reports: "administrator", users: "administrator", services: "staff" };
 
+  // ---- inline icon set (feather-style strokes) -----------------------------
+  const S = (p) =>
+    `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${p}</svg>`;
+
+  window.APP_ICONS = {
+    dashboard: S('<rect x="3" y="3" width="7" height="9" rx="1.5"/><rect x="14" y="3" width="7" height="5" rx="1.5"/><rect x="14" y="12" width="7" height="9" rx="1.5"/><rect x="3" y="16" width="7" height="5" rx="1.5"/>'),
+    facilities: S('<rect x="4" y="3" width="16" height="18" rx="2"/><path d="M9 8h1M14 8h1M9 12h1M14 12h1M9 16h1M14 16h1"/><path d="M2 21h20"/>'),
+    reservations: S('<rect x="3" y="5" width="18" height="16" rx="2"/><path d="M16 3v4M8 3v4M3 11h18"/><path d="M9 15l2 2 4-4"/>'),
+    approvals: S('<path d="M12 2l2.4 1.8 2.9-.4 1 2.8 2.6 1.4-.6 2.9L21 12l-.6 2.9.6 2.9-2.6 1.4-1 2.8-2.9-.4L12 22l-2.4-1.8-2.9.4-1-2.8-2.6-1.4.6-2.9L3 12l.6-2.9-.6-2.9 2.6-1.4 1-2.8 2.9.4z"/><path d="M9 12l2 2 4-4"/>'),
+    services: S('<path d="M14.7 6.3a4.5 4.5 0 0 0-6 5.6L3 17.6V21h3.4l5.7-5.7a4.5 4.5 0 0 0 5.6-6L14.4 11l-1.4-1.4 2.7-3.3z"/><path d="M14 14l6-6M17 5l2 2"/>'),
+    audit: S('<path d="M8 6h13M8 12h13M8 18h13"/><path d="M3 6h.01M3 12h.01M3 18h.01"/>'),
+    reports: S('<path d="M3 3v18h18"/><path d="M7 15l4-6 3 3 5-8"/>'),
+    users: S('<path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>'),
+    logout: S('<path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="M16 17l5-5-5-5"/><path d="M21 12H9"/>'),
+    clock: S('<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>'),
+    check: S('<path d="M22 11.1V12a10 10 0 1 1-5.9-9.1"/><path d="M22 4L12 14l-3-3"/>'),
+    alert: S('<path d="M10.3 3.9L1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/><path d="M12 9v4M12 17h.01"/>'),
+    trend: S('<path d="M23 6l-9.5 9.5-5-5L1 18"/><path d="M17 6h6v6"/>'),
+    sparkle: S('<path d="M12 3l1.9 5.1L19 10l-5.1 1.9L12 17l-1.9-5.1L5 10l5.1-1.9z"/><path d="M19 15l.9 2.1L22 18l-2.1.9L19 21l-.9-2.1L16 18l2.1-.9z"/>'),
+    pin: S('<path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/>'),
+    calendar: S('<rect x="3" y="5" width="18" height="16" rx="2"/><path d="M16 3v4M8 3v4M3 11h18"/>'),
+    building: S('<rect x="4" y="3" width="16" height="18" rx="2"/><path d="M9 8h1M14 8h1M9 12h1M14 12h1M9 16h1M14 16h1"/>'),
+    wrench: S('<path d="M14.7 6.3a4.5 4.5 0 0 0-6 5.6L3 17.6V21h3.4l5.7-5.7a4.5 4.5 0 0 0 5.6-6L14.4 11l-1.4-1.4 2.7-3.3z"/>')
+  };
+
   window.App = Object.assign({}, window.App || {}, {
     currentRoute: "dashboard",
 
@@ -164,7 +189,10 @@
       const p = window.Auth.state.profile;
       const roleName = p ? p.role : "guest";
       const links = (NAV[roleName] || []).map(
-        ([r, label]) => `<a class="nav-link" data-route="${r}" href="#/${r}">${label}</a>`
+        ([r, label]) => `<a class="nav-link" data-route="${r}" href="#/${r}">
+          <span class="nav-ico">${window.APP_ICONS[r] || ""}</span>
+          <span class="nav-label">${label}</span>
+        </a>`
       ).join("");
 
       document.getElementById("app-root").innerHTML = `
@@ -183,7 +211,7 @@
                   ${p ? UI.badge(p.role) : ""}
                 </div>
               </div>
-              <button class="btn btn-ghost btn-block btn-sm" onclick="App.signOut()">Sign out</button>
+              <button class="btn btn-ghost btn-block btn-sm" onclick="App.signOut()">${window.APP_ICONS.logout} <span>Sign out</span></button>
             </div>
           </aside>
           <main class="main">
